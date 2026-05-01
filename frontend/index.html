@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus EMS | Intelligent Event Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+
+<!-- ===== LOADING SCREEN ===== -->
+<div id="loader" class="loader-overlay">
+    <div class="loader-content">
+        <div class="loader-logo">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="loader-text">Smart Campus EMS</div>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+    </div>
+</div>
+
+<!-- ===== AUTH MODAL ===== -->
+<div id="authModal" class="modal-overlay active">
+    <div class="auth-container">
+        <div class="auth-brand">
+            <div class="auth-logo"><i class="fas fa-graduation-cap"></i></div>
+            <h1>Smart Campus <span>EMS</span></h1>
+            <p>Intelligent Event Management System</p>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="auth-form active">
+            <h2>Welcome Back</h2>
+            <p class="auth-subtitle">Sign in to your campus account</p>
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="loginEmail" placeholder="your@campus.edu" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> Password</label>
+                <div class="input-pass">
+                    <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password">
+                    <button onclick="togglePass('loginPassword')" class="pass-toggle"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="handleLogin()">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+            <div class="demo-credentials">
+                <span>Demo:</span>
+                <button onclick="fillDemo('admin@campus.edu','password123')">Admin</button>
+                <button onclick="fillDemo('priya@campus.edu','password123')">Organizer</button>
+                <button onclick="fillDemo('rahul@campus.edu','password123')">Student</button>
+            </div>
+            <p class="auth-switch">Don't have an account? <a href="#" onclick="switchAuth('register')">Register</a></p>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" class="auth-form">
+            <h2>Create Account</h2>
+            <p class="auth-subtitle">Join Smart Campus EMS today</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Full Name</label>
+                    <input type="text" id="regName" placeholder="Your full name">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Phone</label>
+                    <input type="tel" id="regPhone" placeholder="+91 9876543210">
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="regEmail" placeholder="your@campus.edu">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-building"></i> Department</label>
+                    <input type="text" id="regDept" placeholder="e.g. Computer Science">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user-tag"></i> Role</label>
+                    <select id="regRole">
+                        <option value="STUDENT">Student</option>
+                        <option value="ORGANIZER">Organizer</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> Password</label>
+                <div class="input-pass">
+                    <input type="password" id="regPassword" placeholder="Min. 8 characters">
+                    <button onclick="togglePass('regPassword')" class="pass-toggle"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="handleRegister()">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+            <p class="auth-switch">Already have an account? <a href="#" onclick="switchAuth('login')">Sign In</a></p>
+        </div>
+
+        <!-- OTP Form -->
+        <div id="otpForm" class="auth-form">
+            <div class="otp-icon"><i class="fas fa-shield-alt"></i></div>
+            <h2>Verify Email</h2>
+            <p class="auth-subtitle">Enter the 6-digit OTP sent to <strong id="otpEmailDisplay"></strong></p>
+            <div class="otp-inputs">
+                <input type="text" class="otp-box" maxlength="1" id="otp0" oninput="otpMove(0)">
+                <input type="text" class="otp-box" maxlength="1" id="otp1" oninput="otpMove(1)">
+                <input type="text" class="otp-box" maxlength="1" id="otp2" oninput="otpMove(2)">
+                <input type="text" class="otp-box" maxlength="1" id="otp3" oninput="otpMove(3)">
+                <input type="text" class="otp-box" maxlength="1" id="otp4" oninput="otpMove(4)">
+                <input type="text" class="otp-box" maxlength="1" id="otp5" oninput="otpMove(5)">
+            </div>
+            <button class="btn-primary" onclick="handleVerifyOtp()">
+                <i class="fas fa-check-circle"></i> Verify OTP
+            </button>
+            <p class="auth-switch">Didn't receive? <a href="#" onclick="handleResendOtp()">Resend OTP</a></p>
+            <div id="otpTimer" class="otp-timer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="app" class="app hidden">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <div>
+                    <span class="logo-text">Campus</span>
+                    <span class="logo-sub">EMS</span>
+                </div>
+            </div>
+            <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="user-card">
+            <div class="user-avatar" id="sidebarAvatar">A</div>
+            <div class="user-info">
+                <div class="user-name" id="sidebarName">Loading...</div>
+                <div class="user-role" id="sidebarRole">Student</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" onclick="showSection('dashboard')">
+                <i class="fas fa-th-large"></i><span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('events')">
+                <i class="fas fa-calendar-alt"></i><span>Events</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('myEvents')">
+                <i class="fas fa-ticket-alt"></i><span>My Registrations</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('map')">
+                <i class="fas fa-map-marked-alt"></i><span>Campus Map</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('notifications')">
+                <i class="fas fa-bell"></i><span>Notifications</span>
+                <span class="nav-badge" id="notifBadge">0</span>
+            </a>
+            <div class="nav-section-title admin-only" id="adminNav">ADMIN</div>
+            <a href="#" class="nav-item admin-only" id="adminNavItem" onclick="showSection('admin')">
+                <i class="fas fa-cog"></i><span>Admin Panel</span>
+            </a>
+            <a href="#" class="nav-item organizer-only" id="createEventNav" onclick="showSection('createEvent')">
+                <i class="fas fa-plus-circle"></i><span>Create Event</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+
+        <!-- Top Navbar -->
+        <header class="topnav">
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="topnav-center">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Search events..." oninput="globalSearchHandler()">
+                    <div id="searchDropdown" class="search-dropdown"></div>
+                </div>
+            </div>
+            <div class="topnav-right">
+                <button class="icon-btn" onclick="showSection('notifications')">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="topNotifBadge">0</span>
+                </button>
+                <button class="icon-btn" onclick="toggleChatbot()">
+                    <i class="fas fa-robot"></i>
+                </button>
+                <div class="topnav-user" onclick="showSection('profile')">
+                    <div class="topnav-avatar" id="topAvatar">A</div>
+                    <span id="topName">User</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Sections -->
+        <main class="content-area">
+
+            <!-- ===== DASHBOARD ===== -->
+            <section id="sec-dashboard" class="section active">
+                <div class="section-header">
+                    <div>
+                        <h1 id="dashGreeting">Good Morning!</h1>
+                        <p>Here's what's happening on campus today.</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-outline" onclick="showSection('events')">
+                            <i class="fas fa-calendar"></i> Browse Events
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card purple">
+                        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="statTotal">0</div>
+                            <div class="stat-label">Total Events</div>
+                        </div>
+                        <div class="stat-wave"></div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="statUpcoming">0</div>
+                            <div class="stat-label">Upcoming</div>
+                        </div>
+                        <div class="stat-wave"></div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="fas fa-check-double"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="statCompleted">0</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-wave"></div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="statRegistrations">0</div>
+                            <div class="stat-label">Registrations</div>
+                        </div>
+                        <div class="stat-wave"></div>
+                    </div>
+                </div>
+
+                <!-- Featured Events -->
+                <div class="section-subtitle">
+                    <h2><i class="fas fa-star"></i> Featured Events</h2>
+                    <a href="#" onclick="showSection('events')">View All →</a>
+                </div>
+                <div class="featured-carousel" id="featuredEvents">
+                    <div class="loading-events">
+                        <i class="fas fa-spinner fa-spin"></i> Loading events...
+                    </div>
+                </div>
+
+                <!-- Upcoming Events Grid -->
+                <div class="section-subtitle">
+                    <h2><i class="fas fa-fire"></i> Upcoming Events</h2>
+                    <a href="#" onclick="showSection('events')">View All →</a>
+                </div>
+                <div class="events-grid" id="dashUpcomingEvents"></div>
+            </section>
+
+            <!-- ===== EVENTS ===== -->
+            <section id="sec-events" class="section">
+                <div class="section-header">
+                    <div>
+                        <h1>All Events</h1>
+                        <p>Discover and register for campus events</p>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <button class="filter-btn active" onclick="filterEvents('ALL', this)">
+                        <i class="fas fa-th"></i> All
+                    </button>
+                    <button class="filter-btn" onclick="filterEvents('TECHNICAL', this)">
+                        <i class="fas fa-laptop-code"></i> Technical
+                    </button>
+                    <button class="filter-btn" onclick="filterEvents('CULTURAL', this)">
+                        <i class="fas fa-theater-masks"></i> Cultural
+                    </button>
+                    <button class="filter-btn" onclick="filterEvents('SPORTS', this)">
+                        <i class="fas fa-running"></i> Sports
+                    </button>
+                    <button class="filter-btn" onclick="filterEvents('WORKSHOP', this)">
+                        <i class="fas fa-tools"></i> Workshop
+                    </button>
+                    <button class="filter-btn" onclick="filterEvents('SEMINAR', this)">
+                        <i class="fas fa-microphone"></i> Seminar
+                    </button>
+                    <button class="filter-btn" onclick="filterEvents('ACADEMIC', this)">
+                        <i class="fas fa-book"></i> Academic
+                    </button>
+                </div>
+
+                <div class="events-grid" id="allEventsGrid">
+                    <div class="loading-events">
+                        <i class="fas fa-spinner fa-spin"></i> Loading events...
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== MY REGISTRATIONS ===== -->
+            <section id="sec-myEvents" class="section">
+                <div class="section-header">
+                    <div>
+                        <h1>My Registrations</h1>
+                        <p>Your registered events and tickets</p>
+                    </div>
+                </div>
+                <div id="myRegistrationsGrid" class="events-grid">
+                    <div class="loading-events"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                </div>
+            </section>
+
+            <!-- ===== CAMPUS MAP ===== -->
+            <section id="sec-map" class="section">
+                <div class="section-header">
+                    <div>
+                        <h1><i class="fas fa-map-marked-alt"></i> Campus Event Map</h1>
+                        <p>Find event locations on campus</p>
+                    </div>
+                </div>
+                <div class="map-container">
+                    <div id="campusMap"></div>
+                    <div class="map-legend">
+                        <h3><i class="fas fa-map-pin"></i> Event Locations</h3>
+                        <div id="mapEventList" class="map-event-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== NOTIFICATIONS ===== -->
+            <section id="sec-notifications" class="section">
+                <div class="section-header">
+                    <div>
+                        <h1>Notifications</h1>
+                        <p>Stay updated with campus events</p>
+                    </div>
+                    <button class="btn-outline" onclick="markAllRead()">
+                        <i class="fas fa-check-double"></i> Mark All Read
+                    </button>
+                </div>
+                <div id="notificationsContainer" class="notifications-list"></div>
+            </section>
+
+            <!-- ===== CREATE EVENT ===== -->
+            <section id="sec-createEvent" class="section">
+                <div class="section-header">
+                    <div>
+                        <h1><i class="fas fa-plus-circle"></i> Create New Event</h1>
+                        <p>Fill in the details to create a new campus event</p>
+                    </div>
+                </div>
+                <div class="form-card">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label><i class="fas fa-heading"></i> Event Title *</label>
+                            <input type="text" id="evTitle" placeholder="e.g. Annual TechFest 2025">
+                        </div>
+                        <div class="form-group full-width">
+                            <label><i class="fas fa-align-left"></i> Description *</label>
+                            <textarea id="evDesc" rows="4" placeholder="Describe your event..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-tag"></i> Category *</label>
+                            <select id="evCategory">
+                                <option value="">Select Category</option>
+                                <option value="TECHNICAL">Technical</option>
+                                <option value="CULTURAL">Cultural</option>
+                                <option value="SPORTS">Sports</option>
+                                <option value="WORKSHOP">Workshop</option>
+                                <option value="SEMINAR">Seminar</option>
+                                <option value="ACADEMIC">Academic</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Venue *</label>
+                            <input type="text" id="evVenue" placeholder="e.g. Main Auditorium">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Start Date & Time *</label>
+                            <input type="datetime-local" id="evStart">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-check"></i> End Date & Time *</label>
+                            <input type="datetime-local" id="evEnd">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-users"></i> Max Capacity</label>
+                            <input type="number" id="evCapacity" placeholder="100" value="100" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-star"></i> Mark as Featured</label>
+                            <div class="toggle-group">
+                                <input type="checkbox" id="evFeatured" class="toggle-input">
+                                <label for="evFeatured" class="toggle-label">Feature this event on dashboard</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-location-arrow"></i> Latitude</label>
+                            <input type="number" id="evLat" placeholder="e.g. 12.9716" step="0.0001">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-location-arrow"></i> Longitude</label>
+                            <input type="number" id="evLng" placeholder="e.g. 77.5946" step="0.0001">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn-outline" onclick="showSection('events')">Cancel</button>
+                        <button class="btn-primary" onclick="submitCreateEvent()">
+                            <i class="fas fa-plus"></i> Create Event
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== ADMIN PANEL ===== -->
+            <section id="sec-admin" class="section">
+                <div class="section-header">
+                    <div>
+                        <h1><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+                        <p>Manage events, users, and system settings</p>
+                    </div>
+                </div>
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="showAdminTab('events')">
+                        <i class="fas fa-calendar"></i> Events
+                    </button>
+                    <button class="admin-tab" onclick="showAdminTab('users')">
+                        <i class="fas fa-users"></i> Users
+                    </button>
+                    <button class="admin-tab" onclick="showAdminTab('analytics')">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </button>
+                </div>
+                <div id="adminContent"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ===== EVENT DETAIL MODAL ===== -->
+    <div id="eventModal" class="modal-overlay">
+        <div class="event-modal">
+            <button class="modal-close" onclick="closeEventModal()"><i class="fas fa-times"></i></button>
+            <div id="eventModalContent"></div>
+        </div>
+    </div>
+
+    <!-- ===== CHATBOT ===== -->
+    <div id="chatbot" class="chatbot-widget hidden">
+        <div class="chatbot-header">
+            <div class="chatbot-avatar"><i class="fas fa-robot"></i></div>
+            <div class="chatbot-info">
+                <div class="chatbot-name">Campus AI Assistant</div>
+                <div class="chatbot-status"><span class="dot"></span> Online</div>
+            </div>
+            <button onclick="toggleChatbot()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="chat-msg bot">
+                <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+                <div class="chat-bubble">
+                    👋 Hi! I'm your Smart Campus AI Assistant!<br><br>
+                    Ask me about events, registrations, venues, or anything campus-related!
+                </div>
+            </div>
+        </div>
+        <div class="chatbot-suggestions">
+            <button onclick="sendQuick('upcoming events')">📅 Upcoming</button>
+            <button onclick="sendQuick('technical events')">💻 Technical</button>
+            <button onclick="sendQuick('how to register')">📝 Register</button>
+            <button onclick="sendQuick('venue locations')">📍 Venues</button>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatInput" placeholder="Type a message..." onkeypress="chatKeyPress(event)">
+            <button onclick="sendChatMessage()" class="chat-send"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Chatbot FAB -->
+    <button class="chatbot-fab" onclick="toggleChatbot()" id="chatFab">
+        <i class="fas fa-robot"></i>
+        <span class="fab-pulse"></span>
+    </button>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
