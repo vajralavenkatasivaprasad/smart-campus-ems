@@ -33,10 +33,10 @@ public class Event {
     @Column(length = 200)
     private String venue;
 
-    @Column(precision = 10, scale = 8)
+    @Column
     private Double latitude;
 
-    @Column(precision = 11, scale = 8)
+    @Column
     private Double longitude;
 
     @Column(name = "start_datetime", nullable = false)
