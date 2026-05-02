@@ -1,0 +1,17 @@
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\model\Event.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\config\JwtUtil.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\SmartCampusEmsApplication.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\service\EventService.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\repository\FeedbackRepository.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\model\Registration.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\repository\RegistrationRepository.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\repository\EventRepository.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\repository\NotificationRepository.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\model\User.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\service\ChatbotService.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\controller\Controllers.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\repository\UserRepository.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\model\Feedback.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\config\SecurityConfig.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\model\Notification.java
+D:\smart-campus-ems\backend\src\main\java\com\campus\ems\service\AuthService.java
