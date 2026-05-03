@@ -35,7 +35,7 @@ public class User {
     private LocalDateTime otpExpiry;
 
     @Column(name = "is_verified")
-    private boolean isVerified = false;
+    private Boolean verified = false;
 
     @Column(name = "profile_image")
     private String profileImage;
