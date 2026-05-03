@@ -1,0 +1,27 @@
+# Maven
+backend/target/
+backend/*.jar
+*.class
+
+# Streamlit
+__pycache__/
+*.pyc
+*.pyo
+.env
+.venv
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads
+uploads/
+
+# Secrets
+*.properties.local
